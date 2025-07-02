@@ -197,21 +197,40 @@ export default function LighthouseTest() {
             {result && (
               <>
                 {/* Score Cards */}
+              
+
+                {/* Score Charts - Alternative View */}
                 <div className="bg-white rounded-2xl shadow-xl p-8">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance Scores</h2>
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance Analysis</h2>
+                  <div className="space-y-6">
                     {[
                       { label: 'Performance', score: result.scores.performance, icon: '⚡' },
                       { label: 'Accessibility', score: result.scores.accessibility, icon: '♿' },
                       { label: 'Best Practices', score: result.scores.bestPractices, icon: '✓' },
                       { label: 'SEO', score: result.scores.seo, icon: '🔍' },
                     ].map((item) => (
-                      <div key={item.label} className={`${getScoreBg(item.score)} rounded-xl p-6 text-center transform hover:scale-105 transition-transform`}>
-                        <div className="text-3xl mb-2">{item.icon}</div>
-                        <div className={`text-4xl font-bold ${getScoreColor(item.score)} mb-2`}>
-                          {formatScore(item.score)}
+                      <div key={item.label} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{item.icon}</span>
+                            <span className="font-semibold text-gray-700">{item.label}</span>
+                          </div>
+                          <span className={`text-2xl font-bold ${getScoreColor(item.score)}`}>
+                            {formatScore(item.score)}
+                          </span>
                         </div>
-                        <div className="text-sm font-medium text-gray-700">{item.label}</div>
+                        <div className="relative h-8 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className={`absolute left-0 top-0 h-full transition-all duration-1000 ease-out ${
+                              item.score >= 0.9 ? 'bg-gradient-to-r from-green-400 to-green-600' :
+                              item.score >= 0.5 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                              'bg-gradient-to-r from-red-400 to-red-600'
+                            }`}
+                            style={{ width: `${formatScore(item.score)}%` }}
+                          >
+                            <div className="h-full bg-white/20 animate-pulse"></div>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
