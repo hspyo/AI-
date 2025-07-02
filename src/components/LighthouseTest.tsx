@@ -18,6 +18,7 @@ interface LighthouseResult {
     totalBlockingTime: string;
     cumulativeLayoutShift: string;
   };
+  screenshot?: string;
   timestamp: string;
 }
 
@@ -26,6 +27,8 @@ export default function LighthouseTest() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LighthouseResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [screenshotLoading, setScreenshotLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +41,30 @@ export default function LighthouseTest() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setScreenshot(null);
 
+    // Capture screenshot
+    setScreenshotLoading(true);
+    try {
+      const screenshotResponse = await fetch('/api/screenshot', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      if (screenshotResponse.ok) {
+        const screenshotData = await screenshotResponse.json();
+        setScreenshot(screenshotData.screenshot);
+      }
+    } catch (err) {
+      console.error('Screenshot error:', err);
+    } finally {
+      setScreenshotLoading(false);
+    }
+
+    // Run Lighthouse test
     try {
       const response = await fetch('/api/lighthouse', {
         method: 'POST',
@@ -99,18 +125,42 @@ export default function LighthouseTest() {
         </div>
       )}
 
-      {loading && (
+      {(loading || screenshotLoading) && (
         <div className="text-center py-12">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">Running Lighthouse test... This may take a minute.</p>
+          <p className="mt-4 text-gray-600">
+            {screenshotLoading && !loading ? 'Capturing screenshot...' : 'Running Lighthouse test... This may take a minute.'}
+          </p>
         </div>
       )}
 
-      {result && (
+      {(result || screenshot) && (
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h2 className="text-2xl font-semibold mb-4">Test Results</h2>
-          <p className="text-gray-600 mb-6">URL: {result.url}</p>
+          <p className="text-gray-600 mb-6">URL: {url}</p>
 
+          {screenshot && (
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-4">Page Screenshot</h3>
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <img 
+                  src={screenshot} 
+                  alt={`Screenshot of ${url}`}
+                  className="w-full h-auto"
+                />
+              </div>
+            </div>
+          )}
+
+          {!result && loading && (
+            <div className="text-center py-8">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <p className="mt-2 text-gray-600">Running performance analysis...</p>
+            </div>
+          )}
+
+          {result && (
+            <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className={`text-3xl font-bold ${getScoreColor(result.scores.performance)}`}>
@@ -169,6 +219,8 @@ export default function LighthouseTest() {
           <p className="text-sm text-gray-500 mt-6">
             Tested at: {new Date(result.timestamp).toLocaleString()}
           </p>
+          </>
+          )}
         </div>
       )}
     </div>
