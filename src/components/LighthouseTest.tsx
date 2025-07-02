@@ -93,12 +93,6 @@ export default function LighthouseTest() {
     return 'text-red-500';
   };
 
-  const getScoreBg = (score: number) => {
-    if (score >= 0.9) return 'bg-green-50';
-    if (score >= 0.5) return 'bg-yellow-50';
-    return 'bg-red-50';
-  };
-
   const formatScore = (score: number) => Math.round(score * 100);
 
   return (
@@ -110,7 +104,7 @@ export default function LighthouseTest() {
             PageSpeed Insights
           </h1>
           <p className="text-xl text-gray-600">
-            Analyze your website's performance, accessibility, and SEO
+            Analyze your website&apos;s performance, accessibility, and SEO
           </p>
         </div>
       
