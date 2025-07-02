@@ -88,141 +88,168 @@ export default function LighthouseTest() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 0.9) return 'text-green-600';
-    if (score >= 0.5) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 0.9) return 'text-green-500';
+    if (score >= 0.5) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
+  const getScoreBg = (score: number) => {
+    if (score >= 0.9) return 'bg-green-50';
+    if (score >= 0.5) return 'bg-yellow-50';
+    return 'bg-red-50';
   };
 
   const formatScore = (score: number) => Math.round(score * 100);
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8 text-center">Lighthouse Test</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4 pb-2">
+            PageSpeed Insights
+          </h1>
+          <p className="text-xl text-gray-600">
+            Analyze your website's performance, accessibility, and SEO
+          </p>
+        </div>
       
-      <form onSubmit={handleSubmit} className="mb-8">
-        <div className="flex gap-4">
-          <input
-            type="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter URL (e.g., https://example.com)"
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? 'Testing...' : 'Run Test'}
-          </button>
-        </div>
-      </form>
-
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-          {error}
-        </div>
-      )}
-
-      {(loading || screenshotLoading) && (
-        <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="mt-4 text-gray-600">
-            {screenshotLoading && !loading ? 'Capturing screenshot...' : 'Running Lighthouse test... This may take a minute.'}
-          </p>
-        </div>
-      )}
-
-      {(result || screenshot) && (
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-semibold mb-4">Test Results</h2>
-          <p className="text-gray-600 mb-6">URL: {url}</p>
-
-          {screenshot && (
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold mb-4">Page Screenshot</h3>
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <img 
-                  src={screenshot} 
-                  alt={`Screenshot of ${url}`}
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
-          )}
-
-          {!result && loading && (
-            <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">Running performance analysis...</p>
-            </div>
-          )}
-
-          {result && (
-            <>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className={`text-3xl font-bold ${getScoreColor(result.scores.performance)}`}>
-                {formatScore(result.scores.performance)}
-              </div>
-              <div className="text-sm text-gray-600 mt-1">Performance</div>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className={`text-3xl font-bold ${getScoreColor(result.scores.accessibility)}`}>
-                {formatScore(result.scores.accessibility)}
-              </div>
-              <div className="text-sm text-gray-600 mt-1">Accessibility</div>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className={`text-3xl font-bold ${getScoreColor(result.scores.bestPractices)}`}>
-                {formatScore(result.scores.bestPractices)}
-              </div>
-              <div className="text-sm text-gray-600 mt-1">Best Practices</div>
-            </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className={`text-3xl font-bold ${getScoreColor(result.scores.seo)}`}>
-                {formatScore(result.scores.seo)}
-              </div>
-              <div className="text-sm text-gray-600 mt-1">SEO</div>
+        {/* Search Form */}
+        <form onSubmit={handleSubmit} className="mb-12">
+          <div className="max-w-3xl mx-auto">
+            <div className="relative">
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter website URL (e.g., https://example.com)"
+                className="w-full px-6 py-4 pr-32 text-lg border-2 border-gray-200 rounded-full focus:outline-none focus:border-blue-500 transition-colors"
+                required
+              />
+              <button
+                type="submit"
+                disabled={loading || screenshotLoading}
+                className="absolute right-3 top-3 px-8 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+              >
+                {loading || screenshotLoading ? 'Analyzing...' : 'Analyze'}
+              </button>
             </div>
           </div>
+        </form>
 
-          <h3 className="text-xl font-semibold mb-4">Performance Metrics</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex justify-between p-3 bg-gray-50 rounded">
-              <span className="text-gray-600">First Contentful Paint</span>
-              <span className="font-semibold">{result.metrics.firstContentfulPaint}</span>
-            </div>
-            <div className="flex justify-between p-3 bg-gray-50 rounded">
-              <span className="text-gray-600">Speed Index</span>
-              <span className="font-semibold">{result.metrics.speedIndex}</span>
-            </div>
-            <div className="flex justify-between p-3 bg-gray-50 rounded">
-              <span className="text-gray-600">Largest Contentful Paint</span>
-              <span className="font-semibold">{result.metrics.largestContentfulPaint}</span>
-            </div>
-            <div className="flex justify-between p-3 bg-gray-50 rounded">
-              <span className="text-gray-600">Time to Interactive</span>
-              <span className="font-semibold">{result.metrics.timeToInteractive}</span>
-            </div>
-            <div className="flex justify-between p-3 bg-gray-50 rounded">
-              <span className="text-gray-600">Total Blocking Time</span>
-              <span className="font-semibold">{result.metrics.totalBlockingTime}</span>
-            </div>
-            <div className="flex justify-between p-3 bg-gray-50 rounded">
-              <span className="text-gray-600">Cumulative Layout Shift</span>
-              <span className="font-semibold">{result.metrics.cumulativeLayoutShift}</span>
+        {/* Error Message */}
+        {error && (
+          <div className="max-w-3xl mx-auto mb-8">
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-lg">
+              <p className="text-red-700">{error}</p>
             </div>
           </div>
+        )}
 
-          <p className="text-sm text-gray-500 mt-6">
-            Tested at: {new Date(result.timestamp).toLocaleString()}
-          </p>
-          </>
-          )}
-        </div>
-      )}
+        {/* Loading State */}
+        {(loading || screenshotLoading) && !screenshot && (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center">
+              <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+            </div>
+            <p className="mt-6 text-lg text-gray-600">
+              {screenshotLoading && !loading ? 'Capturing screenshot...' : 'Running comprehensive analysis...'}
+            </p>
+            <p className="mt-2 text-sm text-gray-500">This may take up to 30 seconds</p>
+          </div>
+        )}
+
+        {/* Results */}
+        {(result || screenshot) && (
+          <div className="space-y-8">
+
+            {/* Screenshot Section */}
+            {screenshot && (
+              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="p-6 border-b border-gray-100">
+                  <h2 className="text-2xl font-bold text-gray-800">Website Preview</h2>
+                  <p className="text-gray-600 mt-1">{url}</p>
+                </div>
+                <div className="p-6">
+                  <div className="rounded-lg overflow-hidden shadow-lg">
+                    <img 
+                      src={screenshot} 
+                      alt={`Screenshot of ${url}`}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Performance Scores */}
+            {!result && loading && (
+              <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="text-center">
+                  <div className="inline-flex items-center justify-center">
+                    <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                  </div>
+                  <p className="mt-4 text-lg text-gray-600">Analyzing performance metrics...</p>
+                </div>
+              </div>
+            )}
+
+            {result && (
+              <>
+                {/* Score Cards */}
+                <div className="bg-white rounded-2xl shadow-xl p-8">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Performance Scores</h2>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                    {[
+                      { label: 'Performance', score: result.scores.performance, icon: '⚡' },
+                      { label: 'Accessibility', score: result.scores.accessibility, icon: '♿' },
+                      { label: 'Best Practices', score: result.scores.bestPractices, icon: '✓' },
+                      { label: 'SEO', score: result.scores.seo, icon: '🔍' },
+                    ].map((item) => (
+                      <div key={item.label} className={`${getScoreBg(item.score)} rounded-xl p-6 text-center transform hover:scale-105 transition-transform`}>
+                        <div className="text-3xl mb-2">{item.icon}</div>
+                        <div className={`text-4xl font-bold ${getScoreColor(item.score)} mb-2`}>
+                          {formatScore(item.score)}
+                        </div>
+                        <div className="text-sm font-medium text-gray-700">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Detailed Metrics */}
+                <div className="bg-white rounded-2xl shadow-xl p-8">
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Core Web Vitals</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { label: 'First Contentful Paint', value: result.metrics.firstContentfulPaint, description: 'Time until the first content appears' },
+                      { label: 'Speed Index', value: result.metrics.speedIndex, description: 'How quickly content is visually displayed' },
+                      { label: 'Largest Contentful Paint', value: result.metrics.largestContentfulPaint, description: 'Time until the largest content element appears' },
+                      { label: 'Time to Interactive', value: result.metrics.timeToInteractive, description: 'Time until the page becomes fully interactive' },
+                      { label: 'Total Blocking Time', value: result.metrics.totalBlockingTime, description: 'Sum of all time periods between FCP and TTI' },
+                      { label: 'Cumulative Layout Shift', value: result.metrics.cumulativeLayoutShift, description: 'Measure of visual stability' },
+                    ].map((metric) => (
+                      <div key={metric.label} className="border border-gray-200 rounded-lg p-5 hover:border-blue-300 transition-colors">
+                        <div className="flex justify-between items-start mb-1">
+                          <h3 className="font-semibold text-gray-800">{metric.label}</h3>
+                          <span className="text-xl font-bold text-blue-600">{metric.value}</span>
+                        </div>
+                        <p className="text-sm text-gray-600">{metric.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="text-center text-sm text-gray-500">
+                  Analysis completed at {new Date(result.timestamp).toLocaleString()}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+      </div>
     </div>
   );
 }
