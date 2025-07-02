@@ -46,17 +46,36 @@ export default function LighthouseTest() {
     // Capture screenshot
     setScreenshotLoading(true);
     try {
-      const screenshotResponse = await fetch('/api/screenshot', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ url }),
-      });
+      let screenshotResponse;
+      
+      // Check if running on localhost
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      if (isLocalhost) {
+        // Use local puppeteer endpoint
+        screenshotResponse = await fetch('/api/screenshot-local', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url }),
+        });
+      } else {
+        // Use production API (PageSpeed)
+        screenshotResponse = await fetch('/api/screenshot', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url }),
+        });
+      }
 
       if (screenshotResponse.ok) {
         const screenshotData = await screenshotResponse.json();
-        setScreenshot(screenshotData.screenshot);
+        if (screenshotData.screenshot) {
+          setScreenshot(screenshotData.screenshot);
+        }
       }
     } catch (err) {
       console.error('Screenshot error:', err);

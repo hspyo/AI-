@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
-import puppeteer from 'puppeteer';
 
 export async function POST(request: Request) {
-  let browser;
-  
   try {
     const { url } = await request.json();
 
@@ -24,46 +21,50 @@ export async function POST(request: Request) {
       );
     }
 
-    // Launch browser
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
-    });
+    // In production (Vercel), we can't use Puppeteer directly
+    // So we'll use Google PageSpeed Insights API to get screenshots
+    const apiKey = process.env.PAGESPEED_API_KEY || '';
+    const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(url)}&screenshot=true${apiKey ? `&key=${apiKey}` : ''}`;
 
-    const page = await browser.newPage();
-    
-    // Set viewport
-    await page.setViewport({
-      width: 1920,
-      height: 1080
-    });
+    try {
+      const response = await fetch(apiUrl);
+      
+      if (!response.ok) {
+        throw new Error(`PageSpeed API error: ${response.status}`);
+      }
 
-    // Navigate to URL
-    await page.goto(url, {
-      waitUntil: 'networkidle2',
-      timeout: 30000
-    });
+      const data = await response.json();
+      
+      // Extract screenshot from PageSpeed results
+      const screenshot = data.lighthouseResult?.fullPageScreenshot?.screenshot?.data ||
+                        data.lighthouseResult?.audits?.['final-screenshot']?.details?.data ||
+                        data.lighthouseResult?.audits?.['screenshot-thumbnails']?.details?.items?.[0]?.data;
+      
+      if (screenshot) {
+        // PageSpeed returns base64 without the data URI prefix
+        const screenshotWithPrefix = screenshot.startsWith('data:') ? screenshot : `data:image/jpeg;base64,${screenshot}`;
+        return NextResponse.json({ screenshot: screenshotWithPrefix });
+      }
 
-    // Take screenshot
-    const screenshot = await page.screenshot({
-      type: 'jpeg',
-      quality: 85,
-      encoding: 'base64'
-    });
+      // If no screenshot available, return null
+      return NextResponse.json({
+        screenshot: null,
+        message: 'Screenshot not available from PageSpeed Insights'
+      });
 
-    await browser.close();
-
-    return NextResponse.json({
-      screenshot: `data:image/jpeg;base64,${screenshot}`
-    });
+    } catch (error) {
+      console.error('PageSpeed API error:', error);
+      return NextResponse.json({
+        screenshot: null,
+        message: 'Failed to get screenshot from PageSpeed Insights',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
 
   } catch (error) {
     console.error('Screenshot error:', error);
-    if (browser) {
-      await browser.close();
-    }
     return NextResponse.json(
-      { error: 'Failed to capture screenshot' },
+      { error: 'Failed to capture screenshot', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
