@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lighthouse Test Application
 
-## Getting Started
+A Next.js application that runs Lighthouse tests on user-provided URLs and displays performance metrics.
 
-First, run the development server:
+## Features
 
+- Run Lighthouse tests on any URL
+- Display performance, accessibility, best practices, and SEO scores
+- Show detailed performance metrics
+- Clean, responsive UI built with React and Tailwind CSS
+
+## Setup
+
+1. Install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the application:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Option 1: Using Google PageSpeed Insights API (Default)
+Simply run the Next.js development server:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The app will use Google's PageSpeed Insights API by default. This works without any additional setup but has rate limits.
 
-## Learn More
+### Option 2: Using Local Lighthouse (Recommended for Development)
+For more accurate results and no rate limits, run the Lighthouse server locally:
 
-To learn more about Next.js, take a look at the following resources:
+1. In one terminal, start the Lighthouse server:
+```bash
+npm run lighthouse-server
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. In another terminal, start the Next.js development server:
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Visit http://localhost:3000
 
-## Deploy on Vercel
+## Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Enter a URL in the input field (e.g., https://example.com)
+2. Click "Run Test"
+3. Wait for the analysis to complete
+4. View the scores and metrics
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## API Options
+
+The application can use two different backends:
+
+1. **Local Lighthouse Server** (port 3001): Runs full Lighthouse tests locally
+2. **Google PageSpeed Insights API**: Falls back to this if local server is not running
+
+## Environment Variables (Optional)
+
+If you want to use your own PageSpeed Insights API key:
+```
+PAGESPEED_API_KEY=your_api_key_here
+```
+
+## Troubleshooting
+
+If you encounter issues with the local Lighthouse server:
+- Make sure Chrome/Chromium is installed on your system
+- The server needs to launch a headless Chrome instance
+- On some systems, you may need to install additional dependencies
